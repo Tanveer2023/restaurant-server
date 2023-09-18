@@ -9,6 +9,14 @@ const wishlistSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  restaurant_name: {
+    type: String,
+    required: true,
+  },
+  restaurant_image: {
+    type: String,
+    required: true,
+  },
 });
 
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);

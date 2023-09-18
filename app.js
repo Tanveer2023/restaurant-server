@@ -83,10 +83,12 @@ app.post("/signup", async (req, res, next) => {
 
 // handle post request to add a restaurant to wishlist
 app.post("/wishlist", async (req, res, next) => {
-  const { email, restaurant_id } = req.body;
+  const { email, restaurant_id, restaurant_name, restaurant_image } = req.body;
   const newWishlist = Wishlist({
     email,
     restaurant_id,
+    restaurant_name,
+    restaurant_image,
   });
 
   try {
@@ -118,13 +120,13 @@ app.get("/wishlist", async (req, res, next) => {
   });
 });
 
-// handle delete request to delete a restaurant from wishlist
-app.delete("/wishlist", async (req, res, next) => {
-  const { email, restaurant_id } = req.body;
+// handle get item based on restaurant id and email
+app.get("/wishlist/:restaurant_id/:email", async (req, res, next) => {
+  const { restaurant_id, email } = req.params;
   let wishlist;
 
   try {
-    wishlist = await Wishlist.deleteOne({
+    wishlist = await Wishlist.findOne({
       email: email,
       restaurant_id: restaurant_id,
     });
@@ -137,6 +139,40 @@ app.delete("/wishlist", async (req, res, next) => {
     data: wishlist,
   });
 });
+
+// handle delete request to delete a restaurant from wishlist
+app.delete("/wishlist/:restaurant_id/:email", async (req, res, next) => {
+
+    const { restaurant_id, email } = req.params;
+    let wishlist;
+
+    console.log(restaurant_id, email)
+    try {
+        wishlist = await Wishlist.findOne({
+            email: email,
+            restaurant_id: restaurant_id,
+        });
+
+        if (!wishlist) {
+            const error = new Error("Error! Restaurant not found.");
+            return next(error);
+        }
+
+        await wishlist.deleteOne();
+
+    } catch (err) {
+        console.log(err);
+        const error = new Error("Error! Something went wrong.");
+        return next(error);
+    }
+
+    res.status(200).json({
+        success: true,
+        data: wishlist,
+    });
+
+});
+
 
 //Connecting to the database
 const dbURI =
