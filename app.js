@@ -83,10 +83,23 @@ app.post("/signup", async (req, res, next) => {
 
 // handle post request to add a restaurant to wishlist
 app.post("/wishlist", async (req, res, next) => {
-  const { email, restaurant_id } = req.body;
+  const { email, restaurant_id, restaurant_name, restaurant_image,restaurant_phone,restaurant_rating,restaurant_review_count,restaurant_city,
+    restaurant_location1,
+    restaurant_latitude,
+    restaurant_longitude,} = req.body;
   const newWishlist = Wishlist({
     email,
     restaurant_id,
+    restaurant_name,
+    restaurant_image,
+    restaurant_phone,
+    restaurant_rating,
+    restaurant_review_count,
+    restaurant_city,
+    restaurant_location1,
+    restaurant_latitude,
+    restaurant_longitude,
+    
   });
 
   try {
@@ -118,13 +131,32 @@ app.get("/wishlist", async (req, res, next) => {
   });
 });
 
-// handle delete request to delete a restaurant from wishlist
-app.delete("/wishlist", async (req, res, next) => {
-  const { email, restaurant_id } = req.body;
+app.get("/wishlist/:email", async (req, res, next) => {
+  const { email } = req.params;
+  try {
+    // Query the database to fetch the user's wishlist based on the email
+    const userWishlist = await Wishlist.find({ email: email });
+    res.status(200).json({
+      success: true,
+      data: userWishlist,
+    });
+  } catch (error) {
+    console.error("Error fetching user's wishlist:", error);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+});
+
+
+// handle get item based on restaurant id and email
+app.get("/wishlist/:restaurant_id/:email", async (req, res, next) => {
+  const { restaurant_id, email } = req.params;
   let wishlist;
 
   try {
-    wishlist = await Wishlist.deleteOne({
+    wishlist = await Wishlist.findOne({
       email: email,
       restaurant_id: restaurant_id,
     });
@@ -138,9 +170,43 @@ app.delete("/wishlist", async (req, res, next) => {
   });
 });
 
+// handle delete request to delete a restaurant from wishlist
+app.delete("/wishlist/:restaurant_id/:email", async (req, res, next) => {
+
+    const { restaurant_id, email } = req.params;
+    let wishlist;
+
+    console.log(restaurant_id, email)
+    try {
+        wishlist = await Wishlist.findOne({
+            email: email,
+            restaurant_id: restaurant_id,
+        });
+
+        if (!wishlist) {
+            const error = new Error("Error! Restaurant not found.");
+            return next(error);
+        }
+
+        await wishlist.deleteOne();
+
+    } catch (err) {
+        console.log(err);
+        const error = new Error("Error! Something went wrong.");
+        return next(error);
+    }
+
+    res.status(200).json({
+        success: true,
+        data: wishlist,
+    });
+
+});
+
+
 //Connecting to the database
 const dbURI =
-  "mongodb+srv://admin:admin123@cluster0.5112iyv.mongodb.net/?retryWrites=true&w=majority";
+  "mongodb+srv://tmohit:1vipXY5OXjrNfFXv@cluster0.eo3qmye.mongodb.net/?retryWrites=true&w=majority";
 
 mongoose
   .connect(dbURI, {
