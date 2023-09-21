@@ -83,15 +83,13 @@ app.post("/signup", async (req, res, next) => {
 
 // handle post request to add a restaurant to wishlist
 app.post("/wishlist", async (req, res, next) => {
-  const { email, restaurant_id, restaurant_name, restaurant_image, restaurant_name, restaurant_image,restaurant_phone,restaurant_rating,restaurant_review_count,restaurant_city,
+  const { email, restaurant_id, restaurant_name, restaurant_image,restaurant_phone,restaurant_rating,restaurant_review_count,restaurant_city,
     restaurant_location1,
     restaurant_latitude,
     restaurant_longitude,} = req.body;
   const newWishlist = Wishlist({
     email,
     restaurant_id,
-    restaurant_name,
-    restaurant_image,
     restaurant_name,
     restaurant_image,
     restaurant_phone,
